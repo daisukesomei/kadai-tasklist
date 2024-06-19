@@ -71,8 +71,15 @@ class TasksController extends Controller
     public function show(string $id)
     {
         $task = Task::findOrFail($id);  //idの該当タスクを取得し代入
+        
+        //ログインidとuser_idが一致していたら詳細を表示。一致しない場合トップページへリダイレクト
+        if(\Auth::id() === $task->user_id){
         //タスク詳細ビューで表示
         return view('tasks.show', [ 'task' => $task]);
+        }else{
+        //トップページへリダイレクト
+        return redirect('/');
+        }
         
     }
 
@@ -83,8 +90,15 @@ class TasksController extends Controller
     public function edit(string $id)
     {
         $task = Task::findOrFail($id); //idの該当タスクを取得し代入
+        
+        //ログインidとuser_idが一致していたら更新画面を表示。一致しない場合トップページへリダイレクト
+        if(\Auth::id() === $task->user_id){
         //タスク更新をビューで表示
         return view('tasks.edit', [ 'task' => $task]);
+        }else{
+        //トップページへリダイレクト
+        return redirect('/');
+        }
     }
 
     /**
@@ -101,10 +115,9 @@ class TasksController extends Controller
             
         //認証済みユーザー（閲覧者）としてタスクをアップデート
 
-
         $task = Task::findOrFail($id);
         
-        //ログインidとuser_idが一致していたらupdateを実施
+        //ログインidとuser_idが一致していたらupdateを実施。
         if(\Auth::id() === $task->user_id) {
             $task->update(['content' => $request->content, 'status' => $request->status]);
         }
